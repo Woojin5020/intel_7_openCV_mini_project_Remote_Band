@@ -1,0 +1,1 @@
+# intel_7_openCV_mini_project_Remote_Band
