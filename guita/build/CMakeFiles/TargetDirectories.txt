@@ -1,0 +1,3 @@
+/home/ydj9072/guita/guita/build/CMakeFiles/guita_client.dir
+/home/ydj9072/guita/guita/build/CMakeFiles/edit_cache.dir
+/home/ydj9072/guita/guita/build/CMakeFiles/rebuild_cache.dir
