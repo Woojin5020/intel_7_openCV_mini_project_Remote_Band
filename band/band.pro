@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network concurrent
 
@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwidget.cpp \
+    mixerwidget.cpp \
     serverwidget.cpp \
     tab1socketserver.cpp
 
 HEADERS += \
     mainwidget.h \
+    mixerwidget.h \
     serverwidget.h \
     tab1socketserver.h
 

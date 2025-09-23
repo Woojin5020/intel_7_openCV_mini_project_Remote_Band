@@ -11,6 +11,7 @@
 #include <QtConcurrent>
 
 #include "tab1socketserver.h"
+#include "mixerwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
@@ -27,5 +28,6 @@ public:
 private:
     Ui::MainWidget *ui;
     Tab1Socketserver *pTab1SocketServer;
+    MixerWidget *m_mixer = nullptr;
 };
 #endif // MAINWIDGET_H

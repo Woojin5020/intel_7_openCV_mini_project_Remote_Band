@@ -17,4 +17,7 @@
         <file>PIANO_G.wav</file>
         <file>PIANO_A.wav</file>
     </qresource>
+    <qresource prefix="/new/prefix1">
+        <file>tom_mid.wav</file>
+    </qresource>
 </RCC>

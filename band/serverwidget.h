@@ -5,6 +5,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QHash>
+#include <QSoundEffect>
+#include <QVector>
 
 #define PORT 5000
 #define BLOCK_SIZE 1024
@@ -22,6 +24,10 @@ public slots:
     bool startServer();
     void stopServer();
 
+    // ★ Mixer 연동
+    void onMixerVolume(const QString &session, int volume); // 0~100
+    void onMixerMute(const QString &session, bool mute);
+
 signals:
     void socketRecvDataSig(const QString &data);
 
@@ -31,6 +37,21 @@ private slots:
     void onDisconnected();
 
 private:
+    QSoundEffect m_pianoC, m_pianoD, m_pianoE, m_pianoF, m_pianoG, m_pianoA, m_pianoB;
+    QSoundEffect m_guitaG, m_guitaD, m_guitaC;
+    QVector<QSoundEffect*> m_drum;
+    QHash<QString,int>  m_volumes; // 0~100
+    QHash<QString,bool> m_mutes;   // true=mute
+
+    inline bool isMuted(const QString &session) const {
+        auto it = m_mutes.constFind(session);
+        return (it != m_mutes.cend()) ? it.value() : false;
+    }
+    inline int volumeOf(const QString &session) const {
+        auto it = m_volumes.constFind(session);
+        return (it != m_volumes.cend()) ? it.value() : 100;
+    }
+
     struct Client {
         QString id;
         QString ip;
@@ -53,7 +74,6 @@ private:
         return {s.left(p), s.mid(p+1)};
     }
 
-private:
     QTcpServer *server = nullptr;
     QHash<QTcpSocket*, Client> clients;
     QHash<QString, QString> idpw;
@@ -77,6 +97,8 @@ private:
         QStringLiteral(":/kick.wav"),
         QStringLiteral(":/cymbal_right.wav")
     };
+
+
 
     bool running = false;
 };
