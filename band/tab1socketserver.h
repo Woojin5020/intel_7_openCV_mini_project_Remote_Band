@@ -15,6 +15,7 @@ class Tab1Socketserver : public QWidget
 public:
     explicit Tab1Socketserver(QWidget *parent = nullptr);
     ~Tab1Socketserver();
+    inline ServerWidget* serverWidget() const { return pServerWidget; }
 
 signals:
     void socketRecvDataSig(QString strRecvData);

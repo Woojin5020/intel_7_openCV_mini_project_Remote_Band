@@ -10,6 +10,21 @@
 #include <QStandardPaths>
 #include <QProcess>
 #include <QtConcurrent>
+#include <QRegularExpression>
+#include <QTemporaryFile>
+#include <QFileInfo>
+#include <QDir>
+#include <QTimer>
+#include <QDebug>                 // 없으면 추가
+
+// ★ 먼저 사용하므로 프로토타입 필요
+static QString extractIfResource(const QString &path);
+
+static inline qreal volPercentToGain(int volPercent) {
+    // QSoundEffect::setVolume은 0.0~1.0
+    // 사람 귀는 로그 스케일이라 약간의 감쇠를 줘도 됨. 일단 선형 매핑.
+    return qBound(0, volPercent, 100) / 100.0;
+}
 
 struct ClientState {
     bool authed = false;
@@ -21,6 +36,42 @@ struct ClientState {
 ServerWidget::ServerWidget(QWidget *parent)
 : QWidget{parent}
 {
+    m_volumes["PIANO"] = 100;
+    m_volumes["GUITA"] = 100;
+    m_volumes["DRUM"]  = 100;
+
+    m_mutes["PIANO"] = false;
+    m_mutes["GUITA"] = false;
+    m_mutes["DRUM"]  = false;
+
+    auto initFx = [](QSoundEffect& fx, const QUrl& url){
+        fx.setSource(url);        // qrc 경로
+        fx.setLoopCount(1);
+        fx.setVolume(1.0);        // 세션 볼륨은 재생 직전에 반영
+        fx.setMuted(false);
+    };
+
+    // Piano
+    initFx(m_pianoC, QUrl("qrc:/PIANO_C.wav"));
+    initFx(m_pianoD, QUrl("qrc:/PIANO_D.wav"));
+    initFx(m_pianoE, QUrl("qrc:/PIANO_E.wav"));
+    initFx(m_pianoF, QUrl("qrc:/PIANO_F.wav"));
+    initFx(m_pianoG, QUrl("qrc:/PIANO_G.wav"));
+    initFx(m_pianoA, QUrl("qrc:/PIANO_A.wav"));
+    initFx(m_pianoB, QUrl("qrc:/PIANO_B.wav"));
+
+    // Guita (리소스 키 이름은 네 프로젝트에 맞춰 그대로)
+    initFx(m_guitaG, QUrl("qrc:/G.wav"));
+    initFx(m_guitaD, QUrl("qrc:/D.wav"));
+    initFx(m_guitaC, QUrl("qrc:/C.wav"));
+
+    // Drum: tom_hi, tom_mid, cymbal_left, kick, cymbal_right
+    m_drum.resize(5);
+    m_drum[0] = new QSoundEffect(this); initFx(*m_drum[0], QUrl("qrc:/tom_hi.wav"));
+    m_drum[1] = new QSoundEffect(this); initFx(*m_drum[1], QUrl("qrc:/tom_mid.wav"));
+    m_drum[2] = new QSoundEffect(this); initFx(*m_drum[2], QUrl("qrc:/cymbal_left.wav"));
+    m_drum[3] = new QSoundEffect(this); initFx(*m_drum[3], QUrl("qrc:/kick.wav"));
+    m_drum[4] = new QSoundEffect(this); initFx(*m_drum[4], QUrl("qrc:/cymbal_right.wav"));
 
 }
 
@@ -101,6 +152,7 @@ void ServerWidget::stopServer()
 void ServerWidget::onNewConnection() {
     while (server->hasPendingConnections()) {
         QTcpSocket *sock = server->nextPendingConnection();
+        sock->setSocketOption(QAbstractSocket::LowDelayOption, 1);
         sock->setParent(this);
         clients.insert(sock, Client{});                   // sock을 키로 상태 저장
         clients[sock].ip = sock->peerAddress().toString();
@@ -150,8 +202,8 @@ void ServerWidget::onReadyRead()
         // 3) 외부로 “원본 그대로” 내보내기
         //   - 시그널이 QByteArray면 그대로
         //   - 시그널이 QString이면 변환만 하고 trim/chop 금지
-        emit socketRecvDataSig(rawLine); // 시그널이 QByteArray인 경우
-        // emit socketRecvDataSig(QString::fromUtf8(rawLine)); // QString 시그널인 경우
+        //emit socketRecvDataSig(rawLine); // 시그널이 QByteArray인 경우
+        emit socketRecvDataSig(QString::fromUtf8(rawLine)); // QString 시그널인 경우
 
         // 4) 내부 처리
         handleLine(c, line);  // 기존 파서 유지 (QByteArray)
@@ -224,63 +276,59 @@ void ServerWidget::handleLine(Client &c, const QByteArray &lineBA)
 void ServerWidget::handlePiano(const QString &payload)
 {
     if (payload.isEmpty()) return;
-
     QChar note = payload.at(0).toUpper();
-    QString wav;
 
-    if (note == QLatin1Char('C')) wav = WAV_PIANO_C;
-    else if (note == QLatin1Char('D')) wav = WAV_PIANO_D;
-    else if (note == QLatin1Char('E')) wav = WAV_PIANO_E;
-    else if (note == QLatin1Char('F')) wav = WAV_PIANO_F;
-    else if (note == QLatin1Char('G')) wav = WAV_PIANO_G;
-    else if (note == QLatin1Char('A')) wav = WAV_PIANO_A;
-    else if (note == QLatin1Char('B')) wav = WAV_PIANO_B;
+    QSoundEffect* fx = nullptr;
+    if (note == QLatin1Char('C')) fx = &m_pianoC;
+    else if (note == QLatin1Char('D')) fx = &m_pianoD;
+    else if (note == QLatin1Char('E')) fx = &m_pianoE;
+    else if (note == QLatin1Char('F')) fx = &m_pianoF;
+    else if (note == QLatin1Char('G')) fx = &m_pianoG;
+    else if (note == QLatin1Char('A')) fx = &m_pianoA;
+    else if (note == QLatin1Char('B')) fx = &m_pianoB;
 
-    if (wav.isEmpty()) {
-        qWarning() << "[PIANO] invalid payload:" << payload;
-        return;
-    }
+    if (!fx) { qWarning() << "[PIANO] invalid payload:" << payload; return; }
 
-    qInfo() << "[AUDIO] PIANO ->" << wav;
-    playWavAsync(wav);
+    if (isMuted("PIANO")) { qInfo() << "[AUDIO] PIANO muted -> skip"; return; }
+    fx->setVolume(volPercentToGain(volumeOf("PIANO")));
+    fx->setMuted(false);
+    fx->play();
 }
 
 void ServerWidget::handleGuita(const QString &payload)
 {
     if (payload.isEmpty()) return;
+    QChar note = payload.at(0).toUpper();
 
-    QChar note = payload.at(0).toUpper();   // ✅ 첫 글자를 대문자로
+    QSoundEffect* fx = nullptr;
+    if (note == QLatin1Char('G')) fx = &m_guitaG;
+    else if (note == QLatin1Char('D')) fx = &m_guitaD;
+    else if (note == QLatin1Char('C')) fx = &m_guitaC;
 
-    QString wav;
-    if (note == QLatin1Char('G')) wav = WAV_GUITA_G;
-    else if (note == QLatin1Char('D')) wav = WAV_GUITA_D;
-    else if (note == QLatin1Char('C')) wav = WAV_GUITA_C;
+    if (!fx) { qWarning() << "[GUITA] invalid payload:" << payload; return; }
 
-    if (wav.isEmpty()) {
-        qWarning() << "[GUITA] invalid payload:" << payload;
-        return;
-    }
-
-    qInfo() << "[AUDIO] GUITA ->" << wav;
-    playWavAsync(wav);
+    if (isMuted("GUITA")) { qInfo() << "[AUDIO] GUITA muted -> skip"; return; }
+    fx->setVolume(volPercentToGain(volumeOf("GUITA")));
+    fx->setMuted(false);
+    fx->play();
 }
 
 void ServerWidget::handleDrum(const QString &payload)
 {
-    // 공백/CR 제거는 여기서 최소만
     const QString p = payload.trimmed();
-
     bool ok = false;
     int v = p.toInt(&ok, 10);
-    if (!ok) { qWarning() << "[DRUM] toInt fail, payload=[" << payload << "]"; return; }
-    if (v < 0 || v >= WAV_DRUM.size()) {
-        qWarning() << "[DRUM] out of range:" << v << "(size" << WAV_DRUM.size() << ")";
+    if (!ok || v < 0 || v >= m_drum.size()) {
+        qWarning() << "[DRUM] invalid payload:" << payload;
         return;
     }
+    auto *fx = m_drum[v];
+    if (!fx) return;
 
-    const QString wav = WAV_DRUM[v];
-    qInfo() << "[AUDIO] DRUM[" << v << "] ->" << wav;
-    playWavAsync(wav);
+    if (isMuted("DRUM")) { qInfo() << "[AUDIO] DRUM muted -> skip"; return; }
+    fx->setVolume(volPercentToGain(volumeOf("DRUM")));
+    fx->setMuted(false);
+    fx->play();
 }
 
 static QString extractIfResource(const QString &path)
@@ -340,4 +388,20 @@ void ServerWidget::playWavAsync(const QString &path)
     if (tryRun("aplay"))  return;
 
     qWarning() << "[AUDIO] no player worked for" << fsPath;
+}
+
+void ServerWidget::onMixerVolume(const QString &session, int volume)
+{
+    QString key = session.trimmed().toUpper();
+    if (key == "GUITAR") key = "GUITA";        // 오타 대비 매핑
+    m_volumes[key] = qBound(0, volume, 100);
+    qInfo() << "[MIXER] volume" << key << "->" << m_volumes[key] << "%";
+}
+
+void ServerWidget::onMixerMute(const QString &session, bool mute)
+{
+    QString key = session.trimmed().toUpper();
+    if (key == "GUITAR") key = "GUITA";
+    m_mutes[key] = mute;
+    qInfo() << "[MIXER] mute" << key << "->" << (mute ? "on" : "off");
 }
