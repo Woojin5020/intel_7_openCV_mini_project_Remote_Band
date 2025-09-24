@@ -1,4 +1,4 @@
-# Install script for directory: /home/ydj9072/guita/guita
+# Install script for directory: /home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/ydj9072/guita/guita/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
