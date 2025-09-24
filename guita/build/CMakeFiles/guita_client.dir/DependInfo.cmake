@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/ydj9072/guita/guita/main.cpp" "CMakeFiles/guita_client.dir/main.cpp.o" "gcc" "CMakeFiles/guita_client.dir/main.cpp.o.d"
+  "/home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita/main.cpp" "CMakeFiles/guita_client.dir/main.cpp.o" "gcc" "CMakeFiles/guita_client.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links.

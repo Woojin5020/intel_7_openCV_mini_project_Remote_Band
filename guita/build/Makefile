@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ydj9072/guita/guita
+CMAKE_SOURCE_DIR = /home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ydj9072/guita/guita/build
+CMAKE_BINARY_DIR = /home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ydj9072/guita/guita/build/CMakeFiles /home/ydj9072/guita/guita/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita/build/CMakeFiles /home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ydj9072/guita/guita/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ubuntu/intel_7_openCV_mini_project_Remote_Band/guita/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
