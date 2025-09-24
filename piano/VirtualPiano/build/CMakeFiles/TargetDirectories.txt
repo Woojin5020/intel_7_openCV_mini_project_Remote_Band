@@ -1,0 +1,3 @@
+/home/ubuntu/VirtualPiano/build/CMakeFiles/VirtualPiano.dir
+/home/ubuntu/VirtualPiano/build/CMakeFiles/edit_cache.dir
+/home/ubuntu/VirtualPiano/build/CMakeFiles/rebuild_cache.dir
