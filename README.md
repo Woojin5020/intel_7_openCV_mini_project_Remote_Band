@@ -25,5 +25,29 @@
 
 ---
 
-## 환경 설정
+## 환경 구성
+### 테스트 환경
+- QT : 5.15.3
+- openCV : 4.12.0
 
+- QT_Server 실행
+  ```
+  ./QT_Server/QT_Server
+  ```
+  - 앱이 뜨면 Start 버튼을 눌러 소켓 서버를 시작합니다.
+
+- 드럼
+  ```
+  ./drum/openCV_project_Drum/drum_server_socket/drum
+  ```
+
+
+- 기타
+  ```
+  ./guita/build.sh
+  ```
+
+- 피아노
+  ```
+  ./piano/VirtualPiano/build.sh
+  ```
