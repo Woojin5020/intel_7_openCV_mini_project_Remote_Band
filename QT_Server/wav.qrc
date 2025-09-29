@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>C.wav</file>
+        <file>D.wav</file>
+        <file>G.wav</file>
+        <file>cymbal_left.wav</file>
+        <file>cymbal_right.wav</file>
+        <file>kick.wav</file>
+        <file>tom_hi.wav</file>
+        <file>tom_mid.wav</file>
+        <file>idpasswd.txt</file>
+        <file>PIANO_B.wav</file>
+        <file>PIANO_C.wav</file>
+        <file>PIANO_D.wav</file>
+        <file>PIANO_E.wav</file>
+        <file>PIANO_F.wav</file>
+        <file>PIANO_G.wav</file>
+        <file>PIANO_A.wav</file>
+    </qresource>
+    <qresource prefix="/new/prefix1">
+        <file>tom_mid.wav</file>
+    </qresource>
+</RCC>
