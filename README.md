@@ -26,28 +26,72 @@
 ---
 
 ## 환경 구성
+
 ### 테스트 환경
+- Ubuntu : 22.04.05 LTS
 - QT : 5.15.3
 - openCV : 4.12.0
 
+### 실행 방법
 - QT_Server 실행
   ```
   ./QT_Server/QT_Server
   ```
   - 앱이 뜨면 Start 버튼을 눌러 소켓 서버를 시작합니다.
 
-- 드럼
+- 드럼 - 실행
   ```
   ./drum/openCV_project_Drum/drum_server_socket/drum
   ```
 
+- 드럼 - IP 변경 방법
+  ```
+  vi drum/openCV_project_Drum/drum_server_socket/drum.cpp
+  
+  138  string server_ip    = (argc>=2)? argv[1] : "10.10.16.55";
+  ```
 
-- 기타
+
+- 기타 - 실행
   ```
   ./guita/build.sh
   ```
 
-- 피아노
+- 기타 - IP 변경 방법
+  ```
+  vi guita/main.cpp
+  
+  22  static string SERVER_IP   = "10.10.16.55";
+  ```
+
+
+
+- 피아노 - 실행
   ```
   ./piano/VirtualPiano/build.sh
   ```
+
+- 피아노 - IP 변경 방법
+  ```
+  vi piano/VirtualPiano/src/main.cpp
+  
+  130  static inline const char* HOST = "10.10.16.55";
+  ```
+
+---
+
+## 실제 사용자 화면
+- QT_Server_Tab1(세션 클라이언트 명령 수신 화면) 
+  ![image/QT_Server_Tab1.jpg](image/tab1_screen.jpg)
+
+- QT_Server_Tab2(세션 볼륨 조절 화면)  
+  ![image/QT_Server_Tab2.jpg](image/tab2_screen.jpg)
+
+- Drum(드럼 세션 사용자 화면)  
+  ![image/drum_screen.jpg](image/drum_screen.jpg)
+
+- Guitar(기타 세션 사용자 화면)  
+  ![image/guitar_screen.jpg](image/guitar_screen.jpg)
+
+- Piano(피아노 세션 사용자 화면)  
+  ![image/piano_screen.jpg](image/piano_screen.jpg)
