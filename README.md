@@ -19,7 +19,7 @@
 
 | 팀원 | 역할 |
 | :---: | :--- |
-| [서우진](https://github.com/Woojin5020) | GitHub 병합 및 레포지토리 관리<br>QT 오디오 볼륨 조절 UI 개발 개발<br>OpenCV 기반 드럼 개발 |
+| [서우진](https://github.com/Woojin5020) | GitHub 병합 및 레포지토리 관리<br>QT 오디오 볼륨 조절 UI 개발<br>OpenCV 기반 드럼 개발 |
 | [윤동준](https://github.com/yundongjun) | QT/악기 클라이언트 간 TCP/소켓 통신 서버 개발<br>OpenCV 기반 기타 개발 |
 | [이진우](https://github.com/LeeJinWoo537) | OpenCV 기반 전자 피아노 개발 |
 
